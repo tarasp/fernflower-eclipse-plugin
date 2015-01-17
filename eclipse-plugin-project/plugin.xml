@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.7"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            defaultHandler="com.topsoft.fernflower.eclipse.plugin.handler.DecompilerPluginHandler"
+            id="com.topsoft.fernflower.eclipse.plugin"
+            name="Convert">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            allPopups="false"
+            locationURI="popup:org.eclipse.jdt.ui.PackageExplorer">
+         <command
+               commandId="com.topsoft.fernflower.eclipse.plugin"
+               label="Decompile with Fernflower.."
+               style="push">
+         </command>
+      </menuContribution>
+   </extension>
+
+</plugin>

@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jface;visibility:=reexport,
+ org.eclipse.jdt.core,
+ org.eclipse.ui.workbench;bundle-version="3.104.0"
+Bundle-Vendor: topsoft
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,swing2swt.jar,lib/commons-lang-2.6.jar
+Bundle-Version: 1.0.0.201411240949
+Bundle-Name: Fernflower Decompiler Plug-in
+Bundle-Activator: com.topsoft.fernflower.eclipse.plugin.Activator
+Bundle-ManifestVersion: 2
+Import-Package: org.eclipse.core.expressions,org.eclipse.core.resource
+ s,org.eclipse.core.resources.filtermatchers,org.eclipse.core.resource
+ s.mapping,org.eclipse.core.resources.refresh,org.eclipse.core.resourc
+ es.team,org.eclipse.core.resources.variableresolvers,org.eclipse.e4.c
+ ore.services.log,org.eclipse.jdt.core,org.eclipse.jdt.launching,org.e
+ clipse.ui.console,org.eclipse.ui.dialogs
+Bundle-SymbolicName: FernflowerDecompilerPlugin;singleton:=true
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
+
