@@ -57,6 +57,8 @@ import org.osgi.service.prefs.BackingStoreException;
 
 import com.topsoft.fernflower.eclipse.plugin.Activator;
 import com.topsoft.fernflower.eclipse.plugin.runner.DecompilerOutputReader;
+import com.topsoft.fernflower.eclipse.plugin.settings.FernflowerSettings;
+import com.topsoft.fernflower.eclipse.plugin.settings.FernflowerSettings.CmdOption;
 import com.topsoft.fernflower.eclipse.plugin.utils.LoggerUtil;
 
 public class DecompileDialog extends Dialog {
@@ -66,6 +68,7 @@ public class DecompileDialog extends Dialog {
 	private Text targetDirectory;
 	private Text pathToDecompilerJar;
 	private Button decompileButton;
+	private FernflowerSettings settings = new FernflowerSettings();
 
 	public DecompileDialog(Shell parentShell) {
 		super(parentShell);
@@ -242,94 +245,18 @@ public class DecompileDialog extends Dialog {
 		grpFernflowerCommandLine.setLayout(new GridLayout(2, false));
 		grpFernflowerCommandLine.setText("Fernflower Command Line Options");
 
-		Button btnCheckButton = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton.setSelection(true);
-		btnCheckButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
-		btnCheckButton.setText("rbr - hide bridge methods");
-
-		Button btnCheckButton_10 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_10.setSelection(true);
-		btnCheckButton_10.setText("den - decompile enumerations");
-
-		Button btnCheckButton_1 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_1.setText("rsy - hide synthetic class members");
-
-		Button btnCheckButton_11 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_11.setSelection(true);
-		btnCheckButton_11.setText("rgn - remove getClass() invocation");
-		btnCheckButton_11.setToolTipText("when it is part of a qualified new statement");
-
-		Button btnCheckButton_2 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_2.setSelection(true);
-		btnCheckButton_2.setText("din - decompile inner classes");
-
-		Button btnBtoInterpret = new Button(grpFernflowerCommandLine, 32);
-		btnBtoInterpret.setSelection(true);
-		btnBtoInterpret.setText("bto - interpret int 1 as boolean true");
-
-		Button btnCheckButton_3 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_3.setSelection(true);
-		btnCheckButton_3.setText("dc4 - collapse 1.4 class references");
-
-		Button btnCheckButton_12 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_12.setSelection(true);
-		btnCheckButton_12.setText("nns - allow for not set synthetic attribute");
-		btnCheckButton_12.setToolTipText("workaround to a compiler bug");
-
-		Button btnCheckButton_4 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_4.setSelection(true);
-		btnCheckButton_4.setText("das - decompile assertions");
-
-		Button btnCheckButton_13 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_13.setSelection(true);
-		btnCheckButton_13.setText("uto - consider nameless types as java.lang.Object");
-		btnCheckButton_13.setToolTipText("workaround to a compiler architecture flaw");
-
-		Button btnCheckButton_5 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_5.setSelection(true);
-		btnCheckButton_5.setText("hes - hide empty super invocation");
-
-		Button btnCheckButton_14 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_14.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent e) {
-			}
-		});
-		btnCheckButton_14.setSelection(true);
-		btnCheckButton_14.setText("udv - reconstruct variable names from debug info");
-		btnCheckButton_14.setToolTipText("if debug information is present");
-
-		Button btnCheckButton_6 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_6.setSelection(true);
-		btnCheckButton_6.setText("hdc - hide empty default constructor");
-
-		Button btnCheckButton_15 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_15.setSelection(true);
-		btnCheckButton_15.setText("rer - remove empty exception ranges");
-
-		Button btnCheckButton_7 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_7.setText("dgs - decompile generic signatures");
-
-		Button btnCheckButton_16 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_16.setSelection(true);
-		btnCheckButton_16.setText("fdi - deinline finally structures");
-
-		Button btnCheckButton_8 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_8.setText("occ - ouput copyright comment");
-
-		Button btnCheckButton_17 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_17.setText("asc - allow only ASCII characters in string literals");
-		btnCheckButton_17
-				.setToolTipText("All other characters will be encoded using Unicode escapes (JLS 3.3). Default encoding is UTF8");
-
-		Button btnCheckButton_9 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_9.setSelection(true);
-		btnCheckButton_9.setText("ner - assume return not throwing exceptions");
-
-		Button btnCheckButton_19 = new Button(grpFernflowerCommandLine, 32);
-		btnCheckButton_19.setText("ren - rename ambiguous classes and class elements");
+		for (final CmdOption cmdOption : settings.getAllOptions()) {
+			final Button button = new Button(grpFernflowerCommandLine, SWT.CHECK);
+			button.setText(cmdOption.name().toLowerCase() + " - " + cmdOption.getOptionDescription());
+			button.setToolTipText(cmdOption.getAdditionalDescription());
+			button.setSelection(cmdOption.getCurrentValue());
+			button.addSelectionListener(new SelectionAdapter() {
+				@Override
+				public void widgetSelected(SelectionEvent e) {
+					cmdOption.setCurrentValue(button.getSelection());
+				}
+			});
+		}
 
 		return container;
 	}
@@ -405,6 +332,7 @@ public class DecompileDialog extends Dialog {
 		arguments.add("java");
 		arguments.add("-jar");
 		arguments.add(pathToDecompilerJar.getText());
+		arguments.add(settings.getOptionsLine());
 		arguments.addAll(Arrays.asList(fileList.getItems()));
 		for (String dependencyResource : dependenciesList.getItems()) {
 			arguments.add("-e=" + dependencyResource);
@@ -420,7 +348,7 @@ public class DecompileDialog extends Dialog {
 
 		ProcessBuilder processBuilder = new ProcessBuilder(command);
 		processBuilder.directory(new File(getProjectOrWorkspaceDirectory()));
-		processBuilder.redirectErrorStream(true);
+
 		try {
 			Process decompilerProcess = processBuilder.start();
 			DecompilerOutputReader outputReader = new DecompilerOutputReader(command,
